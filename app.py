@@ -89,6 +89,26 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@app.route('/api/delete-account', methods=['DELETE'])
+@login_required
+def delete_account():
+    """Delete user account and all their todos"""
+    user_id = current_user.id
+    
+    try:
+        # Delete all todos for this user
+        Todo.query.filter_by(user_id=user_id).delete()
+        
+        # Delete the user
+        User.query.filter_by(id=user_id).delete()
+        
+        db.session.commit()
+        logout_user()
+        
+        return jsonify({'success': True, 'message': 'Account deleted'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ==================== Dashboard Routes ====================
 
