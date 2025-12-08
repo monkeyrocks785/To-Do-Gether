@@ -5,15 +5,27 @@ load_dotenv()
 
 class Config:
     """Base configuration"""
-    # Database - Use PostgreSQL in production, SQLite in development
+    # Database - Use PostgreSQL in production, SQLite in /tmp for development
     if os.environ.get('DATABASE_URL'):
-        # For production (Vercel with external DB)
+        # For production (Vercel with external DB like PostgreSQL)
         SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     else:
-        # For development (local SQLite)
-        DB_PATH = os.path.join(os.path.dirname(__file__), 'db')
-        os.makedirs(DB_PATH, exist_ok=True)
-        SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(DB_PATH, "todos.db")}'
+        # For development (local SQLite in /tmp which is writable)
+        # Vercel: Use /tmp directory (read-write)
+        # Local: Use local db folder
+        if os.getenv('FLASK_ENV') == 'production' or os.path.exists('/var/task'):
+            # Running on Vercel - use /tmp
+            SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/todos.db'
+        else:
+            # Local development - use db folder
+            DB_PATH = os.path.join(os.path.dirname(__file__), 'db')
+            try:
+                os.makedirs(DB_PATH, exist_ok=True)
+            except (OSError, PermissionError):
+                # If we can't create db folder, use /tmp
+                SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/todos.db'
+            else:
+                SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(DB_PATH, "todos.db")}'
     
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
