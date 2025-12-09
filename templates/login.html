@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +17,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .container {
             background: white;
             padding: 40px;
@@ -25,7 +26,7 @@
             width: 100%;
             max-width: 400px;
         }
-        
+
         h1 {
             text-align: center;
             color: #5a4a42;
@@ -33,18 +34,18 @@
             font-size: 28px;
             margin-bottom: 10px;
         }
-        
+
         .subtitle {
             text-align: center;
             color: #8b7b73;
             margin-bottom: 30px;
             font-size: 14px;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -52,7 +53,7 @@
             font-weight: 600;
             font-size: 14px;
         }
-        
+
         input[type="text"],
         input[type="password"] {
             width: 100%;
@@ -64,7 +65,7 @@
             transition: all 0.3s ease;
             background: #fffbf7;
         }
-        
+
         input[type="text"]:focus,
         input[type="password"]:focus {
             outline: none;
@@ -72,7 +73,7 @@
             box-shadow: 0 0 0 3px rgba(234, 182, 118, 0.1);
             background: white;
         }
-        
+
         button {
             width: 100%;
             padding: 12px;
@@ -86,102 +87,130 @@
             transition: all 0.3s ease;
             margin-top: 10px;
         }
-        
+
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(234, 182, 118, 0.3);
         }
-        
+
         button:active {
             transform: translateY(0);
         }
-        
+
         .toggle-link {
             text-align: center;
             margin-top: 20px;
             color: #8b7b73;
             font-size: 14px;
         }
-        
+
         .toggle-link a {
             color: #eab676;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
         }
-        
+
         .toggle-link a:hover {
             color: #d4945f;
         }
-        
+
         .error-message {
             color: #e74c3c;
             font-size: 13px;
             margin-top: 5px;
             display: none;
         }
-        
+
         .success-message {
             color: #27ae60;
             font-size: 13px;
             margin-top: 5px;
             display: none;
         }
+
+        .footer {
+            text-align: center;
+            color: #8b7b73;
+            font-size: 14px;
+            background-color: white;
+            width: 90%;
+            padding: 5px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(234, 182, 118, 0.15);
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .footer a {
+            color: #eab676;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🎯 To-Do-Gether</h1>
         <p class="subtitle">Collaborative Todo Magic!</p>
-        
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required placeholder="Enter your username">
                 <div class="error-message" id="usernameError"></div>
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
                 <div class="error-message" id="passwordError"></div>
             </div>
-            
+
             <button type="submit">Login</button>
             <div class="error-message" id="generalError"></div>
             <div class="success-message" id="generalSuccess"></div>
         </form>
-        
+
         <div class="toggle-link">
             Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a>
         </div>
     </div>
-    
+    <div class="footer">
+        <p>Designed and Developed by <a href="https://www.linkedin.com/in/mayankgarg785">Mayank Garg</a> © 2024</p>
+    </div>
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
-            
+
             // Clear previous errors
             document.getElementById('generalError').style.display = 'none';
             document.getElementById('usernameError').style.display = 'none';
             document.getElementById('passwordError').style.display = 'none';
-            
+
             // Validate
             if (!username) {
                 document.getElementById('usernameError').textContent = 'Username is required';
                 document.getElementById('usernameError').style.display = 'block';
                 return;
             }
-            
+
             if (!password) {
                 document.getElementById('passwordError').textContent = 'Password is required';
                 document.getElementById('passwordError').style.display = 'block';
                 return;
             }
-            
+
             try {
                 const response = await fetch('{{ url_for("login") }}', {
                     method: 'POST',
@@ -190,9 +219,9 @@
                     },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     window.location.href = '{{ url_for("dashboard") }}';
                 } else {
@@ -206,4 +235,5 @@
         });
     </script>
 </body>
+
 </html>
